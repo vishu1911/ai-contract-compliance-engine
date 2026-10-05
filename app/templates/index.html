@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Procurement AI Copilot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            height: 64px;
+            background: #ffffff;
+            border-bottom: 1px solid #dfe5ee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #087f5b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #5c6678;
+            font-size: 13px;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e7f5ef;
+            color: #087f5b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            bottom: 0;
+            left: 0;
+            width: 220px;
+            background: #ffffff;
+            border-right: 1px solid #dfe5ee;
+            padding: 22px 12px;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #8a94a6;
+            padding: 0 12px 10px;
+            letter-spacing: 0.7px;
+        }
+
+        .nav-item {
+            padding: 12px 14px;
+            margin-bottom: 4px;
+            border-radius: 7px;
+            color: #596579;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #e7f5ef;
+            color: #087f5b;
+            font-weight: 600;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 220px;
+            padding: 92px 32px 50px;
+        }
+
+        .page-title {
+            font-size: 27px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .page-subtitle {
+            color: #707b8d;
+            font-size: 14px;
+            margin-bottom: 26px;
+        }
+
+        /* ================= KPI ================= */
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .kpi {
+            background: white;
+            border: 1px solid #e1e6ee;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .kpi-label {
+            color: #7b8596;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            font-size: 25px;
+            font-weight: 600;
+        }
+
+        .kpi-small {
+            font-size: 12px;
+            color: #087f5b;
+            margin-top: 6px;
+        }
+
+        /* ================= CARDS ================= */
+
+        .card {
+            background: white;
+            border: 1px solid #e1e6ee;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        /* ================= CONTRACTS ================= */
+
+        .contract-list {
+            border: 1px solid #edf0f4;
+            border-radius: 8px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .contract-row {
+            padding: 17px;
+            border-bottom: 1px solid #edf0f4;
+            cursor: pointer;
+
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+
+            transition: 0.15s;
+        }
+
+        .contract-row:last-child {
+            border-bottom: none;
+        }
+
+        .contract-row:hover {
+            background: #f7fbf9;
+        }
+
+        .contract-row.selected {
+            background: #e7f5ef;
+            border-left: 4px solid #087f5b;
+        }
+
+        .contract-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .contract-info {
+            color: #7b8596;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .contract-price {
+            color: #087f5b;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            background: #e7f5ef;
+            color: #087f5b;
+        }
+
+        /* ================= FORM ================= */
+
+        .selected-contract {
+            background: #f7f9fc;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .selected-contract-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .selected-contract-info {
+            margin-top: 6px;
+            color: #697586;
+            font-size: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 12px;
+            color: #687386;
+            font-weight: 600;
+        }
+
+        .field input,
+        .field select {
+            border: 1px solid #d7dee8;
+            border-radius: 7px;
+            padding: 11px;
+            font-size: 13px;
+            outline: none;
+            background: white;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #087f5b;
+        }
+
+        .field input:disabled {
+            background: #f4f6f8;
+            color: #697586;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .button {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 17px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .primary {
+            background: #087f5b;
+            color: white;
+        }
+
+        .primary:hover {
+            background: #066b4d;
+        }
+
+        .secondary {
+            background: #edf2f5;
+            color: #435064;
+            margin-left: 8px;
+        }
+
+        .button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        /* ================= ALERT ================= */
+
+        .alert {
+            display: none;
+            padding: 12px;
+            border-radius: 7px;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .alert-success {
+            background: #e7f5ef;
+            color: #087f5b;
+        }
+
+        .alert-error {
+            background: #fff0f0;
+            color: #c92a2a;
+        }
+
+        /* ================= RESULT ================= */
+
+        .result {
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 17px;
+            border-bottom: 1px solid #edf0f4;
+        }
+
+        .result-po {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .result-subtitle {
+            color: #7b8596;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .risk {
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .risk-low {
+            background: #e7f5ef;
+            color: #087f5b;
+        }
+
+        .risk-medium {
+            background: #fff4e5;
+            color: #9a5b00;
+        }
+
+        .risk-high {
+            background: #fff0f0;
+            color: #c92a2a;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: #f7f9fc;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .metric-label {
+            color: #8a94a6;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .recommendation {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7f9fc;
+            border-radius: 8px;
+        }
+
+        .recommendation-label {
+            color: #8a94a6;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .recommendation-value {
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        /* ================= AI ================= */
+
+        .analysis-text {
+            white-space: pre-line;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #4b5567;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 18px;
+            min-height: 120px;
+        }
+
+        .loading {
+            display: none;
+            color: #087f5b;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .empty {
+            padding: 35px;
+            text-align: center;
+            color: #8993a3;
+            font-size: 13px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1100px) {
+
+            .kpis {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .result-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 750px) {
+
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .kpis {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid,
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="header">
+
+    <div class="brand">
+        <div class="brand-icon">P</div>
+        Procurement Copilot
+    </div>
+
+    <div class="header-right">
+        <span>Enterprise Procurement AI</span>
+
+        <div class="user">
+            <div class="avatar">VB</div>
+            <span>Demo User</span>
+        </div>
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<aside class="sidebar">
+
+    <div class="nav-title">
+        Procurement
+    </div>
+
+    <div class="nav-item active"
+         onclick="goTo('dashboard')">
+        ▦ Dashboard
+    </div>
+
+    <div class="nav-item"
+         onclick="goTo('contracts')">
+        ▣ Contracts
+    </div>
+
+    <div class="nav-item"
+         onclick="goTo('create-po')">
+        ▤ Create Purchase Order
+    </div>
+
+    <div class="nav-item"
+         onclick="goTo('result')">
+        ◈ Compliance Results
+    </div>
+
+    <br>
+
+    <div class="nav-title">
+        Intelligence
+    </div>
+
+    <div class="nav-item"
+         onclick="goTo('ai')">
+        ✦ AI Copilot
+    </div>
+
+    <div class="nav-item"
+         onclick="goTo('dashboard')">
+        ◉ Spend Analytics
+    </div>
+
+    <div class="nav-item"
+         onclick="goTo('result')">
+        ⚠ Risk Exceptions
+    </div>
+
+</aside>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="main">
+
+
+<!-- =====================================================
+     DASHBOARD
+===================================================== -->
+
+<section id="dashboard">
+
+    <h1 class="page-title">
+        Procurement Overview
+    </h1>
+
+    <p class="page-subtitle">
+        Review contracts, create purchase orders and validate procurement compliance.
+    </p>
+
+
+    <section class="kpis">
+
+        <div class="kpi">
+
+            <div class="kpi-label">
+                Active Contracts
+            </div>
+
+            <div
+                class="kpi-value"
+                id="kpiContracts">
+                —
+            </div>
+
+            <div class="kpi-small">
+                Available for procurement
+            </div>
+
+        </div>
+
+
+        <div class="kpi">
+
+            <div class="kpi-label">
+                Purchase Orders
+            </div>
+
+            <div
+                class="kpi-value"
+                id="kpiPOs">
+                —
+            </div>
+
+            <div class="kpi-small">
+                Tracked by compliance engine
+            </div>
+
+        </div>
+
+
+        <div class="kpi">
+
+            <div class="kpi-label">
+                High Risk
+            </div>
+
+            <div
+                class="kpi-value"
+                id="kpiHigh">
+                —
+            </div>
+
+            <div class="kpi-small">
+                Requires review
+            </div>
+
+        </div>
+
+
+        <div class="kpi">
+
+            <div class="kpi-label">
+                Potential Leakage
+            </div>
+
+            <div
+                class="kpi-value"
+                id="kpiLeakage">
+                —
+            </div>
+
+            <div class="kpi-small">
+                Detected contract leakage
+            </div>
+
+        </div>
+
+    </section>
+
+</section>
+
+
+<!-- =====================================================
+     CONTRACTS
+===================================================== -->
+
+<section
+    id="contracts"
+    class="card">
+
+    <div class="card-title">
+        Available Contracts
+    </div>
+
+    <div
+        id="contractsList"
+        class="contract-list">
+
+        <div class="empty">
+            Loading contracts...
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     CREATE PO
+===================================================== -->
+
+<section
+    id="create-po"
+    class="card">
+
+    <div class="card-title">
+        Create Purchase Order
+    </div>
+
+
+    <div
+        id="alert"
+        class="alert">
+    </div>
+
+
+    <div
+        id="selectedContract"
+        class="selected-contract">
+
+        <div class="selected-contract-title">
+            No contract selected
+        </div>
+
+        <div class="selected-contract-info">
+            Select a contract above to begin creating a purchase order.
+        </div>
+
+    </div>
+
+
+    <div class="form-grid">
+
+
+        <div class="field">
+
+            <label>
+                Contract
+            </label>
+
+            <select
+                id="contractSelect"
+                onchange="selectContractFromDropdown()">
+
+                <option value="">
+                    Select contract
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Material
+            </label>
+
+            <input
+                id="materialDisplay"
+                disabled
+                placeholder="Select a contract">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Quantity
+            </label>
+
+            <input
+                id="quantity"
+                type="number"
+                min="1"
+                step="1"
+                value="1">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                PO Unit Price (INR)
+            </label>
+
+            <input
+                id="unitPrice"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="Enter PO price">
+
+        </div>
+
+    </div>
+
+
+    <div style="margin-top:20px;">
+
+        <button
+            id="createButton"
+            class="button primary"
+            onclick="createPO()"
+            disabled>
+
+            Create Purchase Order & Check Compliance
+
+        </button>
+
+
+        <button
+            class="button secondary"
+            onclick="resetForm()">
+
+            Clear
+
+        </button>
+
+
+        <div
+            id="poLoading"
+            class="loading">
+
+            Creating purchase order and running compliance checks...
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<section
+    id="result"
+    class="card result">
+
+    <div class="card-title">
+        Purchase Order Compliance Result
+    </div>
+
+
+    <div class="result-header">
+
+        <div>
+
+            <div
+                id="resultPO"
+                class="result-po">
+                PO
+            </div>
+
+            <div
+                id="resultSubtitle"
+                class="result-subtitle">
+            </div>
+
+        </div>
+
+
+        <span
+            id="resultRisk"
+            class="risk risk-high">
+
+            HIGH RISK
+
+        </span>
+
+    </div>
+
+
+    <div class="result-grid">
+
+
+        <div class="metric">
+
+            <div class="metric-label">
+                Contract Price
+            </div>
+
+            <div
+                id="resultContractPrice"
+                class="metric-value">
+                —
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <div class="metric-label">
+                PO Price
+            </div>
+
+            <div
+                id="resultPOPrice"
+                class="metric-value">
+                —
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <div class="metric-label">
+                Price Variance
+            </div>
+
+            <div
+                id="resultVariance"
+                class="metric-value">
+                —
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <div class="metric-label">
+                Potential Leakage
+            </div>
+
+            <div
+                id="resultLeakage"
+                class="metric-value">
+                —
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="recommendation">
+
+        <div class="recommendation-label">
+            Recommended Action
+        </div>
+
+        <div
+            id="resultRecommendation"
+            class="recommendation-value">
+
+            —
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     AI ANALYSIS
+===================================================== -->
+
+<section
+    id="ai"
+    class="card">
+
+    <div class="card-title">
+        AI Compliance Analysis
+    </div>
+
+
+    <div
+        id="analysis"
+        class="analysis-text">
+
+        Create a purchase order to generate the
+        Gemini-powered compliance explanation.
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+let contracts = [];
+
+let selectedContract = null;
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function goTo(sectionId) {
+
+    const section =
+        document.getElementById(sectionId);
+
+    if (!section) {
+        return;
+    }
+
+    section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+/* =====================================================
+   MONEY FORMAT
+===================================================== */
+
+function formatMoney(value) {
+
+    return "₹" +
+        Number(value || 0).toLocaleString(
+            "en-IN",
+            {
+                maximumFractionDigits: 2
+            }
+        );
+}
+
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+async function loadDashboard() {
+
+    try {
+
+        const response =
+            await fetch("/dashboard-summary");
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            "kpiContracts"
+        ).textContent =
+            data.active_contracts;
+
+
+        document.getElementById(
+            "kpiPOs"
+        ).textContent =
+            data.total_purchase_orders;
+
+
+        document.getElementById(
+            "kpiHigh"
+        ).textContent =
+            data.high_risk;
+
+
+        document.getElementById(
+            "kpiLeakage"
+        ).textContent =
+            formatMoney(
+                data.potential_leakage
+            );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   LOAD CONTRACTS
+===================================================== */
+
+async function loadContracts() {
+
+    const list =
+        document.getElementById(
+            "contractsList"
+        );
+
+
+    try {
+
+        const response =
+            await fetch("/contracts");
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load contracts"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        contracts =
+            data.contracts || [];
+
+
+        const select =
+            document.getElementById(
+                "contractSelect"
+            );
+
+
+        select.innerHTML =
+            '<option value="">Select contract</option>';
+
+
+        if (contracts.length === 0) {
+
+            list.innerHTML =
+                '<div class="empty">No active contracts found.</div>';
+
+            return;
+
+        }
+
+
+        contracts.forEach(
+            function(contract) {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+                option.value =
+                    contract.contract_id;
+
+                option.textContent =
+                    contract.contract_id +
+                    " — " +
+                    contract.supplier_name +
+                    " — " +
+                    contract.material_name;
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        list.innerHTML = "";
+
+
+        contracts.forEach(
+            function(contract) {
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+                row.className =
+                    "contract-row";
+
+
+                row.id =
+                    "row-" +
+                    contract.contract_id;
+
+
+                row.onclick =
+                    function() {
+
+                        selectContract(
+                            contract.contract_id
+                        );
+
+                    };
+
+
+                row.innerHTML = `
+
+                    <div>
+
+                        <div class="contract-name">
+
+                            ${escapeHtml(contract.contract_id)}
+                            ·
+                            ${escapeHtml(contract.contract_name)}
+
+                        </div>
+
+                        <div class="contract-info">
+
+                            Supplier:
+                            ${escapeHtml(contract.supplier_name)}
+
+                        </div>
+
+                        <div class="contract-info">
+
+                            Material:
+                            ${escapeHtml(contract.material_name)}
+
+                        </div>
+
+                        <div class="contract-info">
+
+                            Valid:
+                            ${contract.effective_date}
+                            →
+                            ${contract.expiry_date}
+
+                        </div>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="badge">
+                            ACTIVE
+                        </span>
+
+                        <div class="contract-price">
+
+                            ${formatMoney(
+                                contract.contract_price
+                            )}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                list.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Contract loading error:",
+            error
+        );
+
+
+        list.innerHTML = `
+
+            <div class="empty">
+
+                Unable to load contracts.
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =====================================================
+   SELECT CONTRACT
+===================================================== */
+
+function selectContract(contractId) {
+
+    selectedContract =
+        contracts.find(
+            function(contract) {
+
+                return contract.contract_id ===
+                    contractId;
+
+            }
+        );
+
+
+    if (!selectedContract) {
+
+        return;
+
+    }
+
+
+    /* Dropdown */
+
+    document.getElementById(
+        "contractSelect"
+    ).value =
+        contractId;
+
+
+    /* Material */
+
+    document.getElementById(
+        "materialDisplay"
+    ).value =
+        selectedContract.material_id +
+        " — " +
+        selectedContract.material_name;
+
+
+    /* Default PO price */
+
+    document.getElementById(
+        "unitPrice"
+    ).value =
+        selectedContract.contract_price;
+
+
+    /* Enable button */
+
+    document.getElementById(
+        "createButton"
+    ).disabled =
+        false;
+
+
+    /* Highlight contract */
+
+    document.querySelectorAll(
+        ".contract-row"
+    ).forEach(
+        function(row) {
+
+            row.classList.remove(
+                "selected"
+            );
+
+        }
+    );
+
+
+    const selectedRow =
+        document.getElementById(
+            "row-" +
+            contractId
+        );
+
+
+    if (selectedRow) {
+
+        selectedRow.classList.add(
+            "selected"
+        );
+
+    }
+
+
+    /* Selected contract information */
+
+    document.getElementById(
+        "selectedContract"
+    ).innerHTML = `
+
+        <div class="selected-contract-title">
+
+            ${escapeHtml(
+                selectedContract.contract_id
+            )}
+
+            ·
+
+            ${escapeHtml(
+                selectedContract.supplier_name
+            )}
+
+        </div>
+
+
+        <div class="selected-contract-info">
+
+            ${escapeHtml(
+                selectedContract.material_name
+            )}
+
+            · Contract Price:
+
+            <strong>
+                ${formatMoney(
+                    selectedContract.contract_price
+                )}
+            </strong>
+
+            · Quantity:
+
+            ${selectedContract.min_quantity}
+            -
+            ${selectedContract.max_quantity}
+
+        </div>
+
+    `;
+
+
+    /* Move user to PO form */
+
+    document.getElementById(
+        "create-po"
+    ).scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =====================================================
+   DROPDOWN CONTRACT
+===================================================== */
+
+function selectContractFromDropdown() {
+
+    const id =
+        document.getElementById(
+            "contractSelect"
+        ).value;
+
+
+    if (id) {
+
+        selectContract(id);
+
+    }
+
+}
+
+
+/* =====================================================
+   CREATE PURCHASE ORDER
+===================================================== */
+
+async function createPO() {
+
+    if (!selectedContract) {
+
+        showAlert(
+            "Please select a contract first.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const quantity =
+        Number(
+            document.getElementById(
+                "quantity"
+            ).value
+        );
+
+
+    const unitPrice =
+        Number(
+            document.getElementById(
+                "unitPrice"
+            ).value
+        );
+
+
+    if (
+        quantity <= 0 ||
+        unitPrice <= 0
+    ) {
+
+        showAlert(
+            "Enter a valid quantity and PO unit price.",
+            true
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "createButton"
+        );
+
+
+    const loading =
+        document.getElementById(
+            "poLoading"
+        );
+
+
+    button.disabled =
+        true;
+
+
+    loading.style.display =
+        "block";
+
+
+    hideAlert();
+
+
+    try {
+
+        /* -----------------------------------------
+           CREATE PO
+        ----------------------------------------- */
+
+        const response =
+            await fetch(
+                "/purchase-orders",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        contract_id:
+                            selectedContract.contract_id,
+
+                        material_id:
+                            selectedContract.material_id,
+
+                        quantity:
+                            quantity,
+
+                        unit_price:
+                            unitPrice
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail ||
+                "Unable to create purchase order."
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           SHOW RESULT
+        ----------------------------------------- */
+
+        showResult(
+            data
+        );
+
+
+        /* -----------------------------------------
+           RUN GEMINI ANALYSIS
+        ----------------------------------------- */
+
+        document.getElementById(
+            "analysis"
+        ).textContent =
+            "Running LangGraph + Gemini analysis...";
+
+
+        const aiResponse =
+            await fetch(
+                "/analyze/" +
+                data.po_id
+            );
+
+
+        const aiData =
+            await aiResponse.json();
+
+
+        if (
+            aiResponse.ok &&
+            aiData.ai_analysis
+        ) {
+
+            document.getElementById(
+                "analysis"
+            ).textContent =
+                aiData.ai_analysis;
+
+        }
+
+        else {
+
+            document.getElementById(
+                "analysis"
+            ).textContent =
+                "PO created successfully, but AI analysis could not be generated.";
+
+        }
+
+
+        showAlert(
+            "Purchase order " +
+            data.po_id +
+            " created successfully.",
+            false
+        );
+
+
+        /* Refresh KPI */
+
+        await loadDashboard();
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        showAlert(
+            error.message,
+            true
+        );
+
+    }
+
+
+    finally {
+
+        button.disabled =
+            false;
+
+        loading.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* =====================================================
+   SHOW RESULT
+===================================================== */
+
+function showResult(data) {
+
+    const result =
+        document.getElementById(
+            "result"
+        );
+
+
+    result.style.display =
+        "block";
+
+
+    document.getElementById(
+        "resultPO"
+    ).textContent =
+        data.po_id;
+
+
+    document.getElementById(
+        "resultSubtitle"
+    ).textContent =
+
+        data.supplier_name +
+        " · " +
+        data.contract_id +
+        " · " +
+        data.material_name;
+
+
+    const risk =
+        document.getElementById(
+            "resultRisk"
+        );
+
+
+    risk.textContent =
+        data.risk_category +
+        " RISK";
+
+
+    risk.className =
+        "risk risk-" +
+        data.risk_category.toLowerCase();
+
+
+    document.getElementById(
+        "resultContractPrice"
+    ).textContent =
+        formatMoney(
+            data.contract_price
+        );
+
+
+    document.getElementById(
+        "resultPOPrice"
+    ).textContent =
+        formatMoney(
+            data.po_price
+        );
+
+
+    document.getElementById(
+        "resultVariance"
+    ).textContent =
+
+        Number(
+            data.price_variance_percent
+        ).toFixed(2) +
+        "%";
+
+
+    document.getElementById(
+        "resultLeakage"
+    ).textContent =
+        formatMoney(
+            data.potential_leakage
+        );
+
+
+    document.getElementById(
+        "resultRecommendation"
+    ).textContent =
+
+        data.recommendation
+            .replaceAll(
+                "_",
+                " "
+            );
+
+
+    result.scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+function resetForm() {
+
+    selectedContract =
+        null;
+
+
+    document.getElementById(
+        "contractSelect"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "materialDisplay"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "quantity"
+    ).value =
+        "1";
+
+
+    document.getElementById(
+        "unitPrice"
+    ).value =
+        "";
+
+
+    document.getElementById(
+        "createButton"
+    ).disabled =
+        true;
+
+
+    document.getElementById(
+        "selectedContract"
+    ).innerHTML = `
+
+        <div class="selected-contract-title">
+
+            No contract selected
+
+        </div>
+
+        <div class="selected-contract-info">
+
+            Select a contract above to begin creating a purchase order.
+
+        </div>
+
+    `;
+
+
+    document.getElementById(
+        "result"
+    ).style.display =
+        "none";
+
+
+    document.getElementById(
+        "analysis"
+    ).textContent =
+
+        "Create a purchase order to generate the Gemini-powered compliance explanation.";
+
+
+    document.querySelectorAll(
+        ".contract-row"
+    ).forEach(
+        function(row) {
+
+            row.classList.remove(
+                "selected"
+            );
+
+        }
+    );
+
+
+    hideAlert();
+
+}
+
+
+/* =====================================================
+   ALERT
+===================================================== */
+
+function showAlert(
+    message,
+    error
+) {
+
+    const alert =
+        document.getElementById(
+            "alert"
+        );
+
+
+    alert.textContent =
+        message;
+
+
+    alert.className =
+        error
+            ? "alert alert-error"
+            : "alert alert-success";
+
+
+    alert.style.display =
+        "block";
+
+}
+
+
+function hideAlert() {
+
+    document.getElementById(
+        "alert"
+    ).style.display =
+        "none";
+
+}
+
+
+/* =====================================================
+   HTML SAFETY
+===================================================== */
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    ).replace(
+        /[&<>"']/g,
+        function(match) {
+
+            return {
+
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+
+            }[match];
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   INITIAL LOAD
+===================================================== */
+
+loadDashboard();
+
+loadContracts();
+
+</script>
+
+</body>
+</html>
